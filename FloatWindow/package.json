@@ -1,0 +1,17 @@
+{
+  "name": "cordova-plugin-float-window",
+  "version": "0.1.0",
+  "description": "this is a float window for cordova on android platform",
+  "cordova": {
+    "id": "cordova-plugin-float-window",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "maruiwhu",
+  "license": "ISC"
+}

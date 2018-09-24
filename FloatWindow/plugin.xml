@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-float-window" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+	<name>FloatWindow</name>
+	<js-module name="FloatWindow" src="www/FloatWindow.js">
+		<clobbers target="cordova.plugins.FloatWindow" />
+	</js-module>
+	<platform name="android">
+		<config-file parent="/*" target="res/xml/config.xml">
+			<feature name="FloatWindow">
+				<param name="android-package" value="com.maruiwhu.cordova.plugin.floatwindow.FloatWindow" />
+			</feature>
+		</config-file>
+		<config-file parent="/*" target="AndroidManifest.xml">	
+		</config-file>
+
+		  <config-file target="AndroidManifest.xml" parent="/manifest">
+           <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    		<uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
+        </config-file>
+
+		<source-file src="src/android/com/maruiwhu/cordova/plugin/floatwindow/FloatWindow.java" target-dir="src/com/maruiwhu/cordova/plugin/floatwindow/FloatWindow" />
+
+		<framework src="src/android/floatwindow.gradle" custom="true" type="gradleReference"/>
+		<lib-file src="src/android/floatwindow-release.aar"/>
+	</platform>
+</plugin>
