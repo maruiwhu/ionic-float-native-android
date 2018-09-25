@@ -3,8 +3,10 @@ package com.maruiwhu.floatwindow;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -13,6 +15,7 @@ import android.widget.TextView;
  * 悬浮窗控制类
  */
 public class FloatWindowAndroid {
+    private final int screenWidth;
     /**
      * 悬浮窗内容
      */
@@ -24,6 +27,9 @@ public class FloatWindowAndroid {
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mWindowParams;
 
+    private OnClickListener mClickListener;
+
+
     /**
      *
      */
@@ -33,6 +39,7 @@ public class FloatWindowAndroid {
         mContext = context;
         initFloatWindow(context);
         initFloatView(context);
+        screenWidth = mWindowManager.getDefaultDisplay().getWidth();
     }
 
     public void showFloatButton(String content) {
@@ -78,10 +85,68 @@ public class FloatWindowAndroid {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         mFloatLayout = layoutInflater.inflate(R.layout.layout_float_button, null, false);
         mTvContent = mFloatLayout.findViewById(R.id.content);
+
+        mFloatLayout.setOnTouchListener(new FloatingOnTouchListener());
     }
 
-    public void setOnClickListener(View.OnClickListener onClickListener) {
-        mFloatLayout.setOnClickListener(onClickListener);
+    public interface OnClickListener {
+        void onClick(View view);
     }
+
+    public void setOnClickListener(OnClickListener onClickListener) {
+        mClickListener = onClickListener;
+    }
+
+    private class FloatingOnTouchListener implements View.OnTouchListener {
+        private int x;
+        private int y;
+        int oddOffsetX = 0;
+        int oddOffsetY = 0;
+
+        @Override
+        public boolean onTouch(View view, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    x = (int) event.getRawX();
+                    y = (int) event.getRawY();
+                    oddOffsetX = mWindowParams.x;
+                    oddOffsetY = mWindowParams.y;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    int nowX = (int) event.getRawX();
+                    int nowY = (int) event.getRawY();
+                    int movedX = nowX - x;
+                    int movedY = nowY - y;
+                    Log.d("TAG", "onTouch: " + movedY);
+                    x = nowX;
+                    y = nowY;
+                    mWindowParams.x = mWindowParams.x + movedX;
+                    mWindowParams.y = mWindowParams.y - movedY;
+
+                    // 更新悬浮窗控件布局
+                    mWindowManager.updateViewLayout(view, mWindowParams);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    int newOffsetX = mWindowParams.x;
+                    int newOffsetY = mWindowParams.y;
+                    if (Math.abs(newOffsetX - oddOffsetX) <= 20 && Math.abs(newOffsetY - oddOffsetY) <= 20) {
+                        if (mClickListener != null) {
+                            mClickListener.onClick(view);
+                        }
+                    } else {
+                        // 抬起手指时让floatView紧贴屏幕左右边缘
+                        mWindowParams.x = mWindowParams.x <= (screenWidth / 2) ? 80 : screenWidth - view.getWidth() - 80;
+                        mWindowManager.updateViewLayout(view, mWindowParams);
+
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            return true;
+        }
+    }
+
 
 }

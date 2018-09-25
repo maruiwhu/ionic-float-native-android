@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="/Users/huiyu0006/workspace/ionic/ionic-float-native-android/cordovapluginwindowalert/CordovaLib/src/main/jniLibs"/></dataSet><dataSet config="debug"><source path="/Users/huiyu0006/workspace/ionic/ionic-float-native-android/cordovapluginwindowalert/CordovaLib/src/debug/jniLibs"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="/Users/maruiwhu/ionicwork/cordovapluginwindowalert/CordovaLib/src/main/jniLibs"/></dataSet><dataSet config="debug"><source path="/Users/maruiwhu/ionicwork/cordovapluginwindowalert/CordovaLib/src/debug/jniLibs"/></dataSet></merger>

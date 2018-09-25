@@ -20,6 +20,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         floatWindow = new FloatWindowAndroid(this);
+        floatWindow.setOnClickListener(new FloatWindowAndroid.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                floatWindow.hideFloatButton();
+            }
+        });
         Intent intentService = new Intent();
         intentService.setClass(this, PasteCopyService.class);
         startService(intentService);
