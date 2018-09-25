@@ -15,16 +15,19 @@ export class HomePage {
   showFloat(){
 	cordova.plugins.FloatWindow.showFloat(['this is a title'],result=>alert(result),error=>alert(error));
 }
+
  hideFloat(){
 	cordova.plugins.FloatWindow.hideFloat([],result=>alert(result),error=>alert(error));
 }
 
  registerClipBoard(){
-	cordova.plugins.FloatWindow.registerClipBoardListener([],result=>alert(result),error=>alert(error));
+	cordova.plugins.FloatWindow.registerClipBoardListener([],result=>{console.log(result)
+	alert(result)},error=>alert(error));
 }
 
  unRegisterClipBoard(){
 	cordova.plugins.FloatWindow.unRegisterClipBoardListener([],result=>alert(result),error=>alert(error));
 }
+
 
 }

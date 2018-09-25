@@ -1,5 +1,6 @@
 repositories{
     jcenter()
+    maven { url "https://jitpack.io" }
     flatDir{
         dirs 'libs'
     }
@@ -7,6 +8,7 @@ repositories{
 
 dependencies {
     compile(name:'floatwindow-release', ext:'aar')
+    compile 'com.github.czy1121:settingscompat:1.1.4'
 }
 
 android {

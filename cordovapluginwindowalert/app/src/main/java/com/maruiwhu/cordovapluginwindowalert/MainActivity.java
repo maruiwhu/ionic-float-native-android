@@ -10,6 +10,8 @@ import android.view.View;
 import com.maruiwhu.floatwindow.FloatWindowAndroid;
 import com.maruiwhu.floatwindow.PasteCopyService;
 
+import ezy.assist.compat.SettingsCompat;
+
 public class MainActivity extends AppCompatActivity {
     private FloatWindowAndroid floatWindow;
 
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         startService(intentService);
 
         if (Build.VERSION.SDK_INT >= 23) {
-            if (Settings.canDrawOverlays(this)) {
+            if (SettingsCompat.canDrawOverlays(this)) {
                 //有悬浮窗权限开启服务绑定 绑定权限
 
 

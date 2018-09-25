@@ -79,4 +79,9 @@ public class FloatWindowAndroid {
         mFloatLayout = layoutInflater.inflate(R.layout.layout_float_button, null, false);
         mTvContent = mFloatLayout.findViewById(R.id.content);
     }
+
+    public void setOnClickListener(View.OnClickListener onClickListener) {
+        mFloatLayout.setOnClickListener(onClickListener);
+    }
+
 }

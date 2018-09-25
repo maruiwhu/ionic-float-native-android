@@ -3,9 +3,8 @@ package com.maruiwhu.cordovapluginwindowalert;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.provider.Settings;
+import android.util.Log;
+import android.view.View;
 
 import com.maruiwhu.floatwindow.FloatWindowAndroid;
 
@@ -17,6 +16,8 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import ezy.assist.compat.SettingsCompat;
+
 /**
  * This class echoes a string called from JavaScript.
  */
@@ -24,6 +25,7 @@ public class FloatWindow extends CordovaPlugin {
     private FloatWindowAndroid floatWindowAndroid;
     private ClipboardManager clipboardManager;
     private ClipBoardListener clipBoardListener;
+    private FloatClickListener floatClickListener;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -56,18 +58,18 @@ public class FloatWindow extends CordovaPlugin {
             @Override
             public void run() {
                 if (content != null && content.length() > 0) {
-                    callbackContext.success(content);
-                    if (Build.VERSION.SDK_INT >= 23) {
-                        if (Settings.canDrawOverlays(cordova.getContext())) {
-                            //有悬浮窗权限开启服务绑定 绑定权限
-                            floatWindowAndroid.showFloatButton(content);
-                        } else {
-                            try {
-                                Intent intent = new Intent("android.settings.action.MANAGE_OVERLAY_PERMISSION");
-                                cordova.getActivity().startActivityForResult(intent, 1000);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    if (floatClickListener == null) {
+                        floatClickListener = new FloatClickListener(callbackContext);
+                        floatWindowAndroid.setOnClickListener(floatClickListener);
+                    }
+                    if (SettingsCompat.canDrawOverlays(cordova.getContext())) {
+                        //有悬浮窗权限开启服务绑定 绑定权限
+                        floatWindowAndroid.showFloatButton(content);
+                    } else {
+                        try {
+                            SettingsCompat.manageDrawOverlays(cordova.getContext());
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                 } else {
@@ -83,23 +85,35 @@ public class FloatWindow extends CordovaPlugin {
             @Override
             public void run() {
                 floatWindowAndroid.hideFloatButton();
+                floatClickListener = null;
                 callbackContext.success();
             }
         });
     }
 
     private void registerClipBoardListener(final CallbackContext callbackContext) {
-        if (clipBoardListener == null) {
-            clipBoardListener = new ClipBoardListener(callbackContext);
-        }
-        clipboardManager.addPrimaryClipChangedListener(clipBoardListener);
-        callbackContext.success();
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (clipBoardListener == null) {
+                    clipBoardListener = new ClipBoardListener(callbackContext);
+                }
+                clipboardManager.addPrimaryClipChangedListener(clipBoardListener);
+            }
+        });
+
     }
 
     private void unRegisterClipBoardListener(final CallbackContext callbackContext) {
-        clipboardManager.removePrimaryClipChangedListener(clipBoardListener);
-        clipBoardListener = null;
-        callbackContext.success();
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                clipboardManager.removePrimaryClipChangedListener(clipBoardListener);
+                clipBoardListener = null;
+                callbackContext.success();
+            }
+        });
+
     }
 
     private class ClipBoardListener implements ClipboardManager.OnPrimaryClipChangedListener {
@@ -115,6 +129,7 @@ public class FloatWindow extends CordovaPlugin {
                 if (clipboardManager.hasPrimaryClip()) {
                     ClipData clipData = clipboardManager.getPrimaryClip();
                     String content = clipData.getItemAt(0).getText().toString();
+                    Log.d("TAG", content);
                     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, content);
                     pluginResult.setKeepCallback(true);
                     callbackContext.sendPluginResult(pluginResult);
@@ -122,6 +137,22 @@ public class FloatWindow extends CordovaPlugin {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }
+    }
+
+    private class FloatClickListener implements View.OnClickListener {
+        private CallbackContext callbackContext;
+
+        public FloatClickListener(CallbackContext callbackContext) {
+            this.callbackContext = callbackContext;
+        }
+
+        @Override
+        public void onClick(View v) {
+            floatWindowAndroid.hideFloatButton();
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "click");
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
         }
     }
 
