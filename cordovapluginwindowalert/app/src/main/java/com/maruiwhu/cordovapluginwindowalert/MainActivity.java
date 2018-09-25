@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.maruiwhu.floatwindow.FloatWindowAndroid;
+import com.maruiwhu.floatwindow.PasteCopyService;
 
 public class MainActivity extends AppCompatActivity {
     private FloatWindowAndroid floatWindow;
@@ -17,6 +18,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         floatWindow = new FloatWindowAndroid(this);
+        Intent intentService = new Intent();
+        intentService.setClass(this, PasteCopyService.class);
+        startService(intentService);
 
         if (Build.VERSION.SDK_INT >= 23) {
             if (Settings.canDrawOverlays(this)) {
