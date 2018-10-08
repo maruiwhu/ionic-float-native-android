@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.show_float).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                floatWindow.showFloatButton("title");
+                floatWindow.showFloatButton("优惠券：200 佣金 48.20");
             }
         });
         findViewById(R.id.hide_float).setOnClickListener(new View.OnClickListener() {

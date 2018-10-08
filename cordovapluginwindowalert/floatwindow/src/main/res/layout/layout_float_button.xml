@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/app_icon"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:scaleType="fitXY"
         android:src="@drawable/icon" />
 
@@ -15,10 +16,16 @@
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="6dp"
+        android:background="@drawable/bg_content"
         android:gravity="center_vertical"
-        android:text="优惠券"
-        android:textColor="@android:color/holo_red_dark" />
+        android:paddingBottom="2dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="2dp"
+        android:textColor="#F3267D"
+        android:textSize="10sp"
+        tools:text="优惠券" />
 
 
 </LinearLayout>

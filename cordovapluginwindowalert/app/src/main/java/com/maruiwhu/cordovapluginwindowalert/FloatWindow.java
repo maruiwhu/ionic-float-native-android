@@ -3,6 +3,9 @@ package com.maruiwhu.cordovapluginwindowalert;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.view.View;
 
 import com.maruiwhu.floatwindow.FloatWindowAndroid;
@@ -29,8 +32,8 @@ public class FloatWindow extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        floatWindowAndroid = new FloatWindowAndroid(cordova.getContext());
-        clipboardManager = (ClipboardManager) cordova.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        floatWindowAndroid = new FloatWindowAndroid(cordova.getActivity());
+        clipboardManager = (ClipboardManager) cordova.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
     }
 
     @Override
@@ -48,8 +51,52 @@ public class FloatWindow extends CordovaPlugin {
         } else if (action.equals("unRegisterClipBoardListener")) {
             this.unRegisterClipBoardListener(callbackContext);
             return true;
+        } else if (action.equals("checkAppInstalled")) {
+            String packageName = args.getString(0);
+            this.checkAppAvailability(packageName, callbackContext);
+            return true;
+        } else if (action.equals("startApp")) {
+            String packageName = args.getString(0);
+            this.startApp(packageName, callbackContext);
+            return true;
+        } else if (action.equals("checkOverlaysPermission")) {
+            this.checkOverlaysPermission(callbackContext);
+            return true;
+        } else if (action.equals("requestOverlaysPermission")) {
+            this.requestOverlaysPermission(callbackContext);
+            return true;
         }
         return false;
+    }
+
+
+    private void checkOverlaysPermission(final CallbackContext callbackContext) {
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (SettingsCompat.canDrawOverlays(cordova.getActivity())) {
+                    //有悬浮窗权限开启服务绑定 绑定权限
+                    callbackContext.success(1);
+                } else {
+                    callbackContext.error(0);
+                }
+            }
+        });
+    }
+
+    private void requestOverlaysPermission(final CallbackContext callbackContext) {
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SettingsCompat.manageDrawOverlays(cordova.getActivity());
+                    callbackContext.success(1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callbackContext.error(0);
+                }
+            }
+        });
     }
 
     private void showFloat(final String content, final CallbackContext callbackContext) {
@@ -61,12 +108,12 @@ public class FloatWindow extends CordovaPlugin {
                         floatClickListener = new FloatClickListener(callbackContext);
                         floatWindowAndroid.setOnClickListener(floatClickListener);
                     }
-                    if (SettingsCompat.canDrawOverlays(cordova.getContext())) {
+                    if (SettingsCompat.canDrawOverlays(cordova.getActivity())) {
                         //有悬浮窗权限开启服务绑定 绑定权限
                         floatWindowAndroid.showFloatButton(content);
                     } else {
                         try {
-                            SettingsCompat.manageDrawOverlays(cordova.getContext());
+                            SettingsCompat.manageDrawOverlays(cordova.getActivity());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -110,6 +157,44 @@ public class FloatWindow extends CordovaPlugin {
                 clipboardManager.removePrimaryClipChangedListener(clipBoardListener);
                 clipBoardListener = null;
                 callbackContext.success();
+            }
+        });
+
+    }
+
+    private void checkAppAvailability(final String packageName, final CallbackContext callbackContext) {
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PackageInfo packageInfo = null;
+                try {
+                    PackageManager packageManager = cordova.getActivity().getPackageManager();
+                    packageManager.getPackageInfo(packageName, 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                if (packageInfo == null) {
+                    callbackContext.success(1);
+                } else {
+                    callbackContext.error(0);
+                }
+            }
+        });
+
+    }
+
+    private void startApp(final String packageName, final CallbackContext callbackContext) {
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Intent intent = cordova.getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
+                    cordova.getActivity().startActivity(intent);
+                    callbackContext.success(1);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    callbackContext.error(0);
+                }
             }
         });
 
